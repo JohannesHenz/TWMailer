@@ -21,7 +21,7 @@ CC=g++
 CFLAGS=-g -Wall -Wextra -Werror -O -std=c++14 -pthread
 
 rebuild: clean all
-all: ./bin/twmailer-client ./bin/twmailer-server
+all: ./bin/twmailer-client ./bin/twmailer-server ./bin/Server-from-scratch ./bin/Client-from-scratch
 
 clean:
 	clear
@@ -32,10 +32,22 @@ clean:
 ./obj/twmailer-server.o: twmailer-server.cpp
 	${CC} ${CFLAGS} -o obj/twmailer-server.o twmailer-server.cpp -c
 
+./obj/Client-from-scratch.o: Client-from-scratch.cpp
+	${CC} ${CFLAGS} -o obj/Client-from-scratch.o Client-from-scratch.cpp -c
+
+./obj/Server-from-scratch.o: Server-from-scratch.cpp
+	${CC} ${CFLAGS} -o obj/Server-from-scratch.o Server-from-scratch.cpp -c
+
 
 ./bin/twmailer-client: ./obj/twmailer-client.o
 	${CC} ${CFLAGS} -o bin/twmailer-client obj/twmailer-client.o
 
 ./bin/twmailer-server: ./obj/twmailer-server.o
 	${CC} ${CFLAGS} -o bin/twmailer-server obj/twmailer-server.o
+
+./bin/Client-from-scratch: ./obj/Client-from-scratch.o
+	${CC} ${CFLAGS} -o bin/Client-from-scratch obj/Client-from-scratch.o
+
+./bin/Server-from-scratch: ./obj/Server-from-scratch.o
+	${CC} ${CFLAGS} -o bin/Server-from-scratch obj/Server-from-scratch.o
 
