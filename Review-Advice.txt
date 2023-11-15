@@ -1,0 +1,27 @@
+Functionality
+Arguments handling
+
+Non applicable, as arguments are ignored for default values instead, with the exception of the host, but that can be just about anything
+Command interface
+
+Asking for the username as the first thing is a very good idea, and while not exactly part of the assignment, also technically not wrong, and saves typing later on.
+
+The client also handles invalid commands, but a list of valid commands somewhere would have been helpful. On the same note, an improvement would be to ignore casing on the commands, e.g. accept "send" or "Send" for a SEND command
+
+One point of critisism though, when the client asks for inputs, it feels like talking to a chat bot, instead of just inputting fields. Simple one-word descriptors would probably have been better in this case.
+
+Further testing however couldn't be conducted, as I couldn't get anything more to work.
+Code
+Client
+
+The code has some indentation errors, but other than that easy to understand, as it is just adapted from the client-server sample code. However apparently all the logic is handled server-side, which depending on interpretation of the assignment is not the intended implementation.
+Server
+
+On the server-side the code is made a bit more readable with the use of helper functions, however the intendations are also very inconsistend. The helper functions are also not forward declarated, which again hinders readability, and the clientCommunications function especially is way too long to be readable, mostly because much of the code repeats itself.
+
+Some functions (READ/DEL/QUIT) are also just not implemented
+Makefile
+
+The provided project didn't have a working client, and make clean didn't delete the executables or object files, but only cleared the console output. Furthermore separate object files are in theory a good idea, but is with only one sourcefile per target quite reduntant. Also the target have non-descript names, instead of just "server" and "client".
+
+However other than that the Makefile has a good structure, and through the use of variables is easy to read and maintain.

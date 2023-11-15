@@ -15,10 +15,25 @@
 #include <regex>
 #include <cstring>
 
+void *clientCommunication(void *data);
 
+void signalHandler(int sig);
+
+void SEND();
+
+void LIST();
+
+void READ();
+
+void DEL();
+
+void QUIT();
+
+void LDAPConnect();
 
 int main()
 {
-    
+    std::string hello = "sup";
+    std::cout << hello << std::endl;
     return 0;
 }

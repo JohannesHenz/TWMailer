@@ -25,93 +25,111 @@ int new_socket = -1;
 void *clientCommunication(void *data);
 void signalHandler(int sig);
 
-void saveMessage(const std::string& sender, const std::string& recipient, const std::string& subject, const std::string& message) {
-    //finde msgnumber raus
-    int index = 0;
-    std::string folderName = "textlogs";
-    std::string indexFileName = folderName + "/index.txt";
-    std::ifstream indexFile1(indexFileName);
-    if (indexFile1.is_open()) {
-        indexFile1 >> index;
-        indexFile1.close();
-    } else {
-        std::cerr << "Failed to read the index." << std::endl;
-    }
-    //erhoehe um 1 und schreib wieder rein, (std::ios::trunc verursacht hierbei, dass der alte index hierbei geloescht wird)
-    index++;
-    std::ofstream indexFile2(indexFileName, std::ios::trunc);
-    if (indexFile2.is_open()) {
-        indexFile2 << index;
-        indexFile2.close();
-    } else {
-        std::cerr << "Failed to save the index." << std::endl;
-    }
-    //now we can create the txt file for the message
-    std::string indexStr = std::to_string(index);
-    std::string filePath = folderName + "/" + indexStr + "_" + sender + "_" + recipient +".txt"; //filename inkludiert
+void saveMessage(const std::string &sender, const std::string &recipient, const std::string &subject, const std::string &message)
+{
+   // finde msgnumber raus
+   int index = 0;
+   std::string folderName = "textlogs";
+   std::string indexFileName = folderName + "/index.txt";
+   std::ifstream indexFile1(indexFileName);
+   if (indexFile1.is_open())
+   {
+      indexFile1 >> index;
+      indexFile1.close();
+   }
+   else
+   {
+      std::cerr << "Failed to read the index." << std::endl;
+   }
+   // erhoehe um 1 und schreib wieder rein, (std::ios::trunc verursacht hierbei, dass der alte index hierbei geloescht wird)
+   index++;
+   std::ofstream indexFile2(indexFileName, std::ios::trunc);
+   if (indexFile2.is_open())
+   {
+      indexFile2 << index;
+      indexFile2.close();
+   }
+   else
+   {
+      std::cerr << "Failed to save the index." << std::endl;
+   }
+   // now we can create the txt file for the message
+   std::string indexStr = std::to_string(index);
+   std::string filePath = folderName + "/" + indexStr + "_" + sender + "_" + recipient + ".txt"; // filename inkludiert
 
-    std::string mail = subject + "\n" + message; //Die text files haben in der ersten zeile das subject und darunter den textkoerper
-    // Write the message to a file
-    std::ofstream outputFile(filePath);
-    if (outputFile.is_open()) {
-        outputFile << mail;
-        outputFile.close();
-    } else {
-        std::cerr << "Failed to save the message." << std::endl;
-    }
+   std::string mail = subject + "\n" + message; // Die text files haben in der ersten zeile das subject und darunter den textkoerper
+   // Write the message to a file
+   std::ofstream outputFile(filePath);
+   if (outputFile.is_open())
+   {
+      outputFile << mail;
+      outputFile.close();
+   }
+   else
+   {
+      std::cerr << "Failed to save the message." << std::endl;
+   }
 }
 
-std::string GetList( [[maybe_unused]] const std::string& username, [[maybe_unused]] const std::string& listUser){ //[[maybe_unused]] wird gebraucht, weil der compiler die argumente in der RegEx nicht sieht. Daher meint er sonst, sie wären unverwendet und heult
-    std::string StringfolderPath = "textlogs";
-    const char* folderPath = StringfolderPath.c_str();  //hat den path nicht gefunden, vllt hilft das ja
-    int msgCount = 0;
-    std::string list = "";
-    DIR* dir = opendir(folderPath);
-    if (!dir) {
-        std::cerr << "Error opening directory" << std::endl;
-        return "";
-    }
-    struct dirent* entry;
-    while ((entry = readdir(dir))) {
-        if (entry->d_type == DT_REG) { //checks if it's a regular file and not a folder
-            std::string fileName = entry->d_name;
-            size_t pos = fileName.find_first_of('_');
-            std::string part1 = fileName.substr(0, pos); // das ist der index
-            fileName = fileName.substr(pos + 1); //nummer und _ wird vorne abgeschnitten
-            pos = fileName.find_first_of('_');
-            std::string sender = fileName.substr(0, pos); //das ist der name des absenders
-            fileName = fileName.substr(pos + 1); //nummer und _ wird vorne abgeschnitten
-            pos = fileName.find_first_of('.');
-            std::string recipient = fileName.substr(0, pos); //das ist der name des empfängers
-            std::cout << sender << std::endl;
-            std::cout << recipient << std::endl;
-            if(sender == username && recipient == listUser) {             // Check if the filename matches the expected pattern
-                std::string filePath = folderPath;                         // schreib den pfad des files in filePath
-                filePath += "/";
-                filePath += entry->d_name;
+std::string GetList([[maybe_unused]] const std::string &username, [[maybe_unused]] const std::string &listUser)
+{ //[[maybe_unused]] wird gebraucht, weil der compiler die argumente in der RegEx nicht sieht. Daher meint er sonst, sie wären unverwendet und heult
+   std::string StringfolderPath = "textlogs";
+   const char *folderPath = StringfolderPath.c_str(); // hat den path nicht gefunden, vllt hilft das ja
+   int msgCount = 0;
+   std::string list = "";
+   DIR *dir = opendir(folderPath);
+   if (!dir)
+   {
+      std::cerr << "Error opening directory" << std::endl;
+      return "";
+   }
+   struct dirent *entry;
+   while ((entry = readdir(dir)))
+   {
+      if (entry->d_type == DT_REG)
+      { // checks if it's a regular file and not a folder
+         std::string fileName = entry->d_name;
+         size_t pos = fileName.find_first_of('_');
+         std::string part1 = fileName.substr(0, pos); // das ist der index
+         fileName = fileName.substr(pos + 1);         // nummer und _ wird vorne abgeschnitten
+         pos = fileName.find_first_of('_');
+         std::string sender = fileName.substr(0, pos); // das ist der name des absenders
+         fileName = fileName.substr(pos + 1);          // nummer und _ wird vorne abgeschnitten
+         pos = fileName.find_first_of('.');
+         std::string recipient = fileName.substr(0, pos); // das ist der name des empfängers
+         std::cout << sender << std::endl;
+         std::cout << recipient << std::endl;
+         if (sender == username && recipient == listUser)
+         {                                     // Check if the filename matches the expected pattern
+            std::string filePath = folderPath; // schreib den pfad des files in filePath
+            filePath += "/";
+            filePath += entry->d_name;
 
-                FILE* file = fopen(filePath.c_str(), "r");
-                if (file) {
-                    char buffer[1024];
-                    if (fgets(buffer, sizeof(buffer), file)) {      //auslesen der ersten zeile, das passiert nur wenn da auch was steht
-                    std::string StrBuffer(buffer); //cast auf string
-                        list = list + StrBuffer + "\n";             //zur liste hinzufügen
-                        ++msgCount;                                   //die messages zählen
-                    }
-                    fclose(file);
-                }
+            FILE *file = fopen(filePath.c_str(), "r");
+            if (file)
+            {
+               char buffer[1024];
+               if (fgets(buffer, sizeof(buffer), file))
+               {                                  // auslesen der ersten zeile, das passiert nur wenn da auch was steht
+                  std::string StrBuffer(buffer);  // cast auf string
+                  list = list + StrBuffer + "\n"; // zur liste hinzufügen
+                  ++msgCount;                     // die messages zählen
+               }
+               fclose(file);
             }
-        }
-    }
+         }
+      }
+   }
 
-    closedir(dir);
+   closedir(dir);
 
-    std::string output = "There are " +   std::to_string(msgCount) + " messages available:\n" + list;
-    std::cout << output << std::endl; 
-    return output; 
-}   
+   std::string output = "There are " + std::to_string(msgCount) + " messages available:\n" + list;
+   std::cout << output << std::endl;
+   return output;
+}
 
-void *clientCommunication(void *data){
+void *clientCommunication(void *data)
+{
    char buffer[BUF];
    int size;
    int *current_socket = (int *)data;
@@ -123,134 +141,152 @@ void *clientCommunication(void *data){
       return NULL;
    }
 
-    int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); //schreibt den username der eingeben wurde in buffer
-    buffer[bytesReceived] = '\0';
+   int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); // schreibt den username der eingeben wurde in buffer
+   buffer[bytesReceived] = '\0';
 
-    std::string username = buffer; //username wird gesetzt
-    strcpy(buffer, "Please enter your command:\r\n");
-   if (send(*current_socket, buffer, strlen(buffer), 0) == -1){
+   std::string username = buffer; // username wird gesetzt
+   strcpy(buffer, "Please enter your command:\r\n");
+   if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
+   {
       perror("send failed");
       return NULL;
    }
 
    do
    {
-      size = recv(*current_socket, buffer, BUF-1, 0); //hier bekommt der server die msg
-      if (size == -1){                                      //dann error handling
-         if (abortRequested){
+      size = recv(*current_socket, buffer, BUF - 1, 0); // hier bekommt der server die msg
+      if (size == -1)
+      { // dann error handling
+         if (abortRequested)
+         {
             perror("recv error after aborted");
          }
-         else{
+         else
+         {
             perror("recv error");
          }
          break;
       }
-      if (size == 0){
+      if (size == 0)
+      {
          printf("Client closed remote socket\n"); // ignore error
          break;
       }
       // remove ugly debug message, because of the sent newline of client
-      if (buffer[size - 2] == '\r' && buffer[size - 1] == '\n'){
+      if (buffer[size - 2] == '\r' && buffer[size - 1] == '\n')
+      {
          size -= 2;
       }
-      else if (buffer[size - 1] == '\n'){
+      else if (buffer[size - 1] == '\n')
+      {
          --size;
       }
-    //here we can finally act on the command
+      // here we can finally act on the command
       buffer[size] = '\0';
       printf("Command received: %s\n", buffer); // ignore error
 
-    if(strcmp(buffer, "SEND") == 0){
-    //in diesem case wird basically der code von myserver.c reinkopiert. 
-                    strcpy(buffer, "Who do you want to mail?\r\n");
-                        if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
-                        {
-                            perror("send failed");
-                            return NULL;
-                        }
-                        int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); //schreibt den username der eingeben wurde in buffer
-                        buffer[bytesReceived] = '\0';
-                        std::string recipient = buffer; //recipient wird gesetzt
-                    strcpy(buffer, "What's the subject of the mail?\r\n");
-                        if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
-                        {
-                            perror("send failed");
-                            return NULL;
-                        }
-                        bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); //schreibt den username der eingeben wurde in buffer
-                        buffer[bytesReceived] = '\0';
-                        std::string subject = buffer; //subject wird gesetzt
-                    strcpy(buffer, "Please enter your message:\r\n");
-                    if (send(*current_socket, buffer, strlen(buffer), 0) == -1){
-                        perror("send failed");
-                        return NULL;
-                    }
-                        size = recv(*current_socket, buffer, BUF - 1, 0);
-                        if (size == -1)
-                        {
-                            if (abortRequested)
-                            {
-                                perror("recv error after aborted");
-                            }
-                            else
-                            {
-                                perror("recv error");
-                            }
-                            break;
-                        }
-
-                        if (size == 0)
-                        {
-                            printf("Client closed remote socket\n"); // ignore error
-                            break;
-                        }
-
-                        // remove ugly debug message, because of the sent newline of client
-                        if (buffer[size - 2] == '\r' && buffer[size - 1] == '\n')
-                        {
-                            size -= 2;
-                        }
-                        else if (buffer[size - 1] == '\n')
-                        {
-                            --size;
-                        }
-
-                        buffer[size] = '\0';
-                        saveMessage(username, recipient, subject, buffer); //recipient is hier derweil noch "server"
-                        printf("Message received: %s\n", buffer); // ignore error
-
-                        if (send(*current_socket, "OK", 3, 0) == -1)
-                        {
-                            perror("send answer failed");
-                            return NULL;
-                        }
+      if (strcmp(buffer, "SEND") == 0)
+      {
+         // in diesem case wird basically der code von myserver.c reinkopiert.
+         strcpy(buffer, "Who do you want to mail?\r\n");
+         if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
+         {
+            perror("send failed");
+            return NULL;
+         }
+         int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); // schreibt den username der eingeben wurde in buffer
+         buffer[bytesReceived] = '\0';
+         std::string recipient = buffer; // recipient wird gesetzt
+         strcpy(buffer, "What's the subject of the mail?\r\n");
+         if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
+         {
+            perror("send failed");
+            return NULL;
+         }
+         bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); // schreibt den username der eingeben wurde in buffer
+         buffer[bytesReceived] = '\0';
+         std::string subject = buffer; // subject wird gesetzt
+         strcpy(buffer, "Please enter your message:\r\n");
+         if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
+         {
+            perror("send failed");
+            return NULL;
+         }
+         size = recv(*current_socket, buffer, BUF - 1, 0);
+         if (size == -1)
+         {
+            if (abortRequested)
+            {
+               perror("recv error after aborted");
             }
-        else if(strcmp(buffer, "LIST") == 0){
-                        strcpy(buffer, "Whose messages you received do you want listed?\r\n");
-                        if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
-                        {
-                            perror("send failed");
-                            return NULL;
-                        }
-                        int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); //schreibt den username der eingeben wurde in buffer
-                        buffer[bytesReceived] = '\0';
-                        std::string listUser = buffer; //listUser wird gesetzt
-                        
-                        if (send(*current_socket, GetList(username, listUser).c_str(), 100000000, 0) == -1){
-                            perror("send answer failed");
-                            return NULL;
-                        }
+            else
+            {
+               perror("recv error");
+            }
+            break;
+         }
 
-        }
-        else if(strcmp(buffer, "READ") == 0){}
-        else if(strcmp(buffer, "DEL") == 0){}
-        else if(strcmp(buffer, "QUIT") == 0){}
-        else{
-                    if (send(*current_socket, "not a legal command", 20, 0) == -1){
-                    perror("send answer failed");
-                    return NULL;
-                    }
-        }
+         if (size == 0)
+         {
+            printf("Client closed remote socket\n"); // ignore error
+            break;
+         }
+
+         // remove ugly debug message, because of the sent newline of client
+         if (buffer[size - 2] == '\r' && buffer[size - 1] == '\n')
+         {
+            size -= 2;
+         }
+         else if (buffer[size - 1] == '\n')
+         {
+            --size;
+         }
+
+         buffer[size] = '\0';
+         saveMessage(username, recipient, subject, buffer); // recipient is hier derweil noch "server"
+         printf("Message received: %s\n", buffer);          // ignore error
+
+         if (send(*current_socket, "OK", 3, 0) == -1)
+         {
+            perror("send answer failed");
+            return NULL;
+         }
+      }
+      else if (strcmp(buffer, "LIST") == 0)
+      {
+         strcpy(buffer, "Whose messages you received do you want listed?\r\n");
+         if (send(*current_socket, buffer, strlen(buffer), 0) == -1)
+         {
+            perror("send failed");
+            return NULL;
+         }
+         int bytesReceived = recv(*current_socket, buffer, strlen(buffer), 0); // schreibt den username der eingeben wurde in buffer
+         buffer[bytesReceived] = '\0';
+         std::string listUser = buffer; // listUser wird gesetzt
+
+         if (send(*current_socket, GetList(username, listUser).c_str(), 100000000, 0) == -1)
+         {
+            perror("send answer failed");
+            return NULL;
+         }
+      }
+      else if (strcmp(buffer, "READ") == 0)
+      {
+      }
+      else if (strcmp(buffer, "DEL") == 0)
+      {
+      }
+      else if (strcmp(buffer, "QUIT") == 0)
+      {
+      }
+      else
+      {
+         if (send(*current_socket, "not a legal command", 20, 0) == -1)
+         {
+            perror("send answer failed");
+            return NULL;
+         }
+      }
    } while (strcmp(buffer, "QUIT") != 0 && !abortRequested);
 
    // closes/frees the descriptor if not already
@@ -408,5 +444,3 @@ int main(void)
 
    return EXIT_SUCCESS;
 }
-
-
