@@ -40,6 +40,10 @@ void LDAPConnect();
 
 int main() {
   int reuseValue = -1;
+  socklen_t addrlen;
+  struct sockaddr_in serverAddress, clientAddress;
+
+
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuseValue,
@@ -53,6 +57,13 @@ int main() {
     perror("Port already in Use");
     exit(EXIT_FAILURE);
   }
+
+  if (bind(sockfd, (struct sockaddr *)&serverAddress,sizeof(serverAddress)) == -1)
+  {
+    perror("bind error");
+    exit(EXIT_FAILURE);
+  }
+  
 
   return 0;
 }
