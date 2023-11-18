@@ -28,6 +28,8 @@ void *clientCommunication(void *data);
 
 void signalHandler(int sig);
 
+void LOGIN();
+
 void SEND();
 
 void LIST();
